@@ -77,6 +77,12 @@ export async function POST(request: Request, { params }: RouteParams) {
   const ext = file.name.split(".").pop()?.toLowerCase() ?? fileType.toLowerCase()
   const storagePath = `${user.id}/${projectId}/${document.id}.${ext}`
 
+  // Auto-create private bucket if it doesn't exist yet
+  const { data: buckets } = await supabaseAdmin.storage.listBuckets()
+  if (!buckets?.find((b) => b.name === "documents")) {
+    await supabaseAdmin.storage.createBucket("documents", { public: false })
+  }
+
   const buffer = await file.arrayBuffer()
   const { error: storageError } = await supabaseAdmin.storage
     .from("documents")
