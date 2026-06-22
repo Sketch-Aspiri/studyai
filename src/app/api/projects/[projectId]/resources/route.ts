@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { db } from "@/lib/db"
 import { ResourceType } from "@prisma/client"
 import { generateSummary } from "@/lib/ai/generate-summary"
+import { generateConceptMap } from "@/lib/ai/generate-concept-map"
 import { z } from "zod"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
@@ -48,8 +49,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
   const { type, document_ids, title } = parsed.data
 
-  // Only SUMMARY implemented in Step 8
-  if (type !== "SUMMARY") {
+  if (type === "EXAM" || type === "FLASHCARDS") {
     return NextResponse.json({ error: "Este tipo de recurso estará disponible próximamente." }, { status: 501 })
   }
 
@@ -83,7 +83,7 @@ export async function POST(request: Request, { params }: RouteParams) {
           data: {
             project_id: projectId,
             user_id: user.id,
-            type: ResourceType.SUMMARY,
+            type: type as ResourceType,
             title,
             content: {},
             document_ids,
@@ -92,15 +92,30 @@ export async function POST(request: Request, { params }: RouteParams) {
         resourceId = resource.id
         controller.enqueue(encode({ type: "start", resource_id: resource.id }))
 
+        const generator = type === "SUMMARY"
+          ? generateSummary(documentTexts)
+          : generateConceptMap(documentTexts)
+
         let fullText = ""
-        for await (const chunk of generateSummary(documentTexts)) {
+        for await (const chunk of generator) {
           fullText += chunk
           controller.enqueue(encode({ type: "chunk", content: chunk }))
         }
 
+        let savedContent: object
+        if (type === "SUMMARY") {
+          savedContent = { text: fullText }
+        } else {
+          try {
+            savedContent = JSON.parse(fullText) as object
+          } catch {
+            throw new Error("La IA devolvió un formato inválido. Intenta de nuevo.")
+          }
+        }
+
         await db.resource.update({
           where: { id: resource.id },
-          data: { content: { text: fullText } },
+          data: { content: savedContent },
         })
 
         controller.enqueue(encode({ type: "done", resource_id: resource.id }))

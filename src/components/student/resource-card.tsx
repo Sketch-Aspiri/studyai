@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { SummaryViewer } from "./summary-viewer"
+import { ConceptMapViewer, type ConceptMapData } from "./concept-map-viewer"
 
 interface Resource {
   id: string
@@ -34,6 +35,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
     resource.type === "SUMMARY"
       ? (resource.content as { text?: string })?.text ?? ""
       : ""
+
+  const conceptMapData =
+    resource.type === "CONCEPT_MAP"
+      ? (resource.content as ConceptMapData)
+      : null
 
   function handleDelete() {
     startTransition(async () => {
@@ -92,6 +98,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       {expanded && summaryText && (
         <div className="border-t border-border px-5 py-4 max-h-[600px] overflow-y-auto">
           <SummaryViewer content={summaryText} />
+        </div>
+      )}
+      {expanded && conceptMapData && (
+        <div className="border-t border-border p-4">
+          <ConceptMapViewer content={conceptMapData} />
         </div>
       )}
     </div>

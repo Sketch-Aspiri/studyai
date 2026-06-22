@@ -75,7 +75,11 @@ export function GenerationPanel({ projectId, documents, accentColor = "var(--pri
               </span>
             )}
             <span className="text-sm font-medium text-foreground">
-              {state.isStreaming ? "Generando resumen..." : state.resourceId ? "Resumen generado" : ""}
+              {state.isStreaming
+                ? `Generando ${RESOURCE_TYPES.find((t) => t.id === selectedType)?.label ?? "recurso"}...`
+                : state.resourceId
+                ? `${RESOURCE_TYPES.find((t) => t.id === selectedType)?.label ?? "Recurso"} generado`
+                : ""}
             </span>
           </div>
           <div className="flex gap-2">
@@ -102,12 +106,20 @@ export function GenerationPanel({ projectId, documents, accentColor = "var(--pri
           </div>
         )}
 
-        {state.content && (
+        {state.content && selectedType === "SUMMARY" && (
           <div className="rounded-[--radius-md] border border-border bg-white px-5 py-4 max-h-[500px] overflow-y-auto">
             <SummaryViewer content={state.content} />
             {state.isStreaming && (
               <span className="inline-block w-0.5 h-4 bg-foreground animate-pulse ml-0.5" />
             )}
+          </div>
+        )}
+        {state.isStreaming && selectedType !== "SUMMARY" && (
+          <div className="rounded-[--radius-md] border border-border bg-surface px-5 py-8 flex flex-col items-center gap-3 text-center">
+            <div className="h-8 w-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: accentColor, borderTopColor: "transparent" }} />
+            <p className="text-sm text-muted">
+              Construyendo {RESOURCE_TYPES.find((t) => t.id === selectedType)?.label}...
+            </p>
           </div>
         )}
       </div>
