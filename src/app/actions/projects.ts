@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db"
 import { createClient } from "@/lib/supabase/server"
+import { ensureUser } from "@/lib/ensure-user"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -37,6 +38,8 @@ export async function createProject(formData: FormData): Promise<ActionResult> {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos." }
   }
+
+  await ensureUser(user)
 
   const dbUser = await db.user.findUnique({
     where: { id: user.id },

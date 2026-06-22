@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { supabaseAdmin } from "@/lib/supabase/admin"
 import { db } from "@/lib/db"
+import { ensureUser } from "@/lib/ensure-user"
 import { FileType } from "@prisma/client"
 import { extractText } from "@/lib/file-processing/extract-text"
 
@@ -23,6 +24,8 @@ export async function POST(request: Request, { params }: RouteParams) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+
+  await ensureUser(user)
 
   const project = await db.project.findFirst({
     where: { id: projectId, user_id: user.id, deleted_at: null },
@@ -81,7 +84,11 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   if (storageError) {
     await db.document.delete({ where: { id: document.id } })
-    return NextResponse.json({ error: "Error al subir al storage." }, { status: 500 })
+    console.error("[Storage upload error]", storageError)
+    return NextResponse.json(
+      { error: `Error al subir al storage: ${storageError.message}` },
+      { status: 500 }
+    )
   }
 
   await db.document.update({ where: { id: document.id }, data: { file_url: storagePath } })

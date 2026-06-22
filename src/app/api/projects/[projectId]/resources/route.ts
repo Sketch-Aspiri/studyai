@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@/lib/db"
 import { ResourceType } from "@prisma/client"
+import { ensureUser } from "@/lib/ensure-user"
 import { generateSummary } from "@/lib/ai/generate-summary"
 import { generateConceptMap } from "@/lib/ai/generate-concept-map"
 import { generateExam } from "@/lib/ai/generate-exam"
@@ -37,6 +38,8 @@ export async function POST(request: Request, { params }: RouteParams) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+
+  await ensureUser(user)
 
   const project = await db.project.findFirst({
     where: { id: projectId, user_id: user.id, deleted_at: null },

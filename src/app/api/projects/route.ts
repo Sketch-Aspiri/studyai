@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@/lib/db"
+import { ensureUser } from "@/lib/ensure-user"
 import { z } from "zod"
 
 const FREE_PROJECT_LIMIT = 2
@@ -33,6 +34,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+
+  await ensureUser(user)
 
   const body: unknown = await request.json()
   const parsed = createSchema.safeParse(body)
