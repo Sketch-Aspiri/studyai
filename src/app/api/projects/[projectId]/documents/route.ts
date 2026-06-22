@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { supabaseAdmin } from "@/lib/supabase/admin"
 import { db } from "@/lib/db"
 import { FileType } from "@prisma/client"
+import { extractText } from "@/lib/file-processing/extract-text"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
 
@@ -13,16 +14,14 @@ const MIME_TO_FILE_TYPE: Record<string, FileType> = {
   "text/plain": FileType.TXT,
 }
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024
 const FREE_DOC_LIMIT = 3
 
 export async function POST(request: Request, { params }: RouteParams) {
   const { projectId } = await params
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
 
   const project = await db.project.findFirst({
@@ -59,7 +58,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "El archivo no puede superar los 10 MB." }, { status: 400 })
   }
 
-  // Create DB record to get the ID for the storage path
+  // Create record with PENDING status to get the ID for the storage path
   const document = await db.document.create({
     data: {
       project_id: projectId,
@@ -82,13 +81,29 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   if (storageError) {
     await db.document.delete({ where: { id: document.id } })
-    return NextResponse.json({ error: "Error al subir el archivo al storage." }, { status: 500 })
+    return NextResponse.json({ error: "Error al subir al storage." }, { status: 500 })
   }
 
-  const updated = await db.document.update({
+  await db.document.update({ where: { id: document.id }, data: { file_url: storagePath } })
+
+  // Extract text — update status to PROCESSING, then COMPLETED or FAILED
+  await db.document.update({
     where: { id: document.id },
-    data: { file_url: storagePath },
+    data: { processing_status: "PROCESSING" },
   })
 
-  return NextResponse.json(updated, { status: 201 })
+  try {
+    const textContent = await extractText(storagePath, fileType)
+    const completed = await db.document.update({
+      where: { id: document.id },
+      data: { text_content: textContent, processing_status: "COMPLETED" },
+    })
+    return NextResponse.json(completed, { status: 201 })
+  } catch {
+    const failed = await db.document.update({
+      where: { id: document.id },
+      data: { processing_status: "FAILED" },
+    })
+    return NextResponse.json(failed, { status: 201 })
+  }
 }

@@ -19,6 +19,7 @@ const MAX_SIZE_MB = 10
 interface UploadState {
   filename: string
   progress: number
+  analyzing: boolean
   error: string | null
 }
 
@@ -41,11 +42,11 @@ export function DocumentUploader({ projectId, accentColor = "var(--primary)" }: 
   function uploadFile(file: File) {
     const validationError = validateFile(file)
     if (validationError) {
-      setUploading({ filename: file.name, progress: 0, error: validationError })
+      setUploading({ filename: file.name, progress: 0, analyzing: false, error: validationError })
       return
     }
 
-    setUploading({ filename: file.name, progress: 0, error: null })
+    setUploading({ filename: file.name, progress: 0, analyzing: false, error: null })
 
     const formData = new FormData()
     formData.append("file", file)
@@ -54,8 +55,9 @@ export function DocumentUploader({ projectId, accentColor = "var(--primary)" }: 
 
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100)
         setUploading((prev) =>
-          prev ? { ...prev, progress: Math.round((e.loaded / e.total) * 100) } : null
+          prev ? { ...prev, progress: pct, analyzing: pct === 100 } : null
         )
       }
     })
@@ -145,7 +147,9 @@ export function DocumentUploader({ projectId, accentColor = "var(--primary)" }: 
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm text-foreground truncate">{uploading.filename}</span>
             {!uploading.error && (
-              <span className="text-xs text-muted flex-shrink-0">{uploading.progress}%</span>
+              <span className="text-xs text-muted flex-shrink-0">
+                {uploading.analyzing ? "Analizando..." : `${uploading.progress}%`}
+              </span>
             )}
           </div>
           {uploading.error ? (
@@ -159,12 +163,19 @@ export function DocumentUploader({ projectId, accentColor = "var(--primary)" }: 
               </button>
             </div>
           ) : (
-            <div className="w-full bg-surface rounded-full h-1.5 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-300"
-                style={{ width: `${uploading.progress}%`, background: accentColor }}
-              />
-            </div>
+            <>
+              <div className="w-full bg-surface rounded-full h-1.5 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-300 ${uploading.analyzing ? "animate-pulse" : ""}`}
+                  style={{ width: `${uploading.progress}%`, background: accentColor }}
+                />
+              </div>
+              {uploading.analyzing && (
+                <p className="text-xs text-muted">
+                  Extrayendo texto con IA, esto puede tomar unos segundos...
+                </p>
+              )}
+            </>
           )}
         </div>
       )}
