@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { logout } from "@/app/auth/actions"
-import { Sidebar, type NavItem } from "@/components/shared/sidebar"
+import { AppShell } from "@/components/shared/app-shell"
+import type { NavItem } from "@/components/shared/sidebar"
 
 const navItems: NavItem[] = [
   {
@@ -43,16 +44,9 @@ const navItems: NavItem[] = [
   },
 ]
 
-export default async function TeacherLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
   const name =
@@ -69,16 +63,15 @@ export default async function TeacherLayout({
     .toUpperCase()
 
   return (
-    <div className="flex min-h-screen bg-surface">
-      <Sidebar
-        items={navItems}
-        variant="teacher"
-        userName={name}
-        userEmail={user.email ?? ""}
-        userInitials={initials}
-        logoutAction={logout}
-      />
-      <main className="flex-1 min-w-0">{children}</main>
-    </div>
+    <AppShell
+      items={navItems}
+      variant="teacher"
+      userName={name}
+      userEmail={user.email ?? ""}
+      userInitials={initials}
+      logoutAction={logout}
+    >
+      {children}
+    </AppShell>
   )
 }

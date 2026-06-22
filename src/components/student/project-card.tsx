@@ -68,15 +68,15 @@ export function ProjectCard({ project, basePath, accentColor = "var(--primary)" 
           </div>
         </Link>
 
-        {/* Menu button */}
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Menu button — always visible on touch, hover-only on pointer devices */}
+        <div className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <div className="relative">
             <button
               onClick={(e) => {
                 e.preventDefault()
                 setMenuOpen((v) => !v)
               }}
-              className="h-7 w-7 flex items-center justify-center rounded-[--radius-sm] text-muted hover:bg-surface hover:text-foreground transition-colors"
+              className="h-9 w-9 flex items-center justify-center rounded-lg text-muted hover:bg-surface hover:text-foreground transition-colors cursor-pointer"
               aria-label="Opciones del proyecto"
             >
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

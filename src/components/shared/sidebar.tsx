@@ -16,6 +16,8 @@ interface SidebarProps {
   userEmail: string
   userInitials: string
   logoutAction: () => Promise<void>
+  isMobileOpen?: boolean
+  onMobileClose?: () => void
 }
 
 export function Sidebar({
@@ -25,6 +27,8 @@ export function Sidebar({
   userEmail,
   userInitials,
   logoutAction,
+  isMobileOpen = false,
+  onMobileClose,
 }: SidebarProps) {
   const pathname = usePathname()
   const isTeacher = variant === "teacher"
@@ -32,32 +36,58 @@ export function Sidebar({
   const accentBg = isTeacher ? "rgba(5,150,105,0.08)" : "rgba(79,70,229,0.08)"
 
   return (
-    <aside className="w-60 flex-shrink-0 border-r border-border bg-white flex flex-col">
-      <div className="h-14 flex items-center px-5 border-b border-border">
-        <span className="text-lg font-bold" style={{ color: accentColor }}>
+    <aside
+      className={[
+        "fixed inset-y-0 left-0 z-50 w-64 flex-shrink-0 border-r border-border bg-white flex flex-col",
+        "transition-transform duration-200 ease-in-out",
+        "md:static md:z-auto md:w-60 md:translate-x-0",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full",
+      ].join(" ")}
+    >
+      {/* Header */}
+      <div className="h-14 flex items-center px-5 border-b border-border gap-2">
+        <span className="flex-1 text-lg font-bold" style={{ color: accentColor }}>
           StudyAI
         </span>
+        {/* Close button — mobile only */}
+        <button
+          onClick={onMobileClose}
+          className="md:hidden flex items-center justify-center h-8 w-8 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+          aria-label="Cerrar menú"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      {/* Nav items */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {items.map((item) => {
           const isActive =
-            pathname === item.href ||
-            pathname.startsWith(item.href + "/")
+            pathname === item.href || pathname.startsWith(item.href + "/")
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-[--radius-sm] px-3 py-2 text-sm font-medium transition-colors"
+              onClick={onMobileClose}
+              className="flex items-center gap-3 rounded-lg px-3 min-h-[44px] text-sm font-medium transition-colors cursor-pointer hover:bg-surface"
               style={
                 isActive
                   ? { background: accentBg, color: accentColor }
                   : undefined
               }
-              data-active={isActive}
             >
-              <span className={isActive ? "" : "text-muted"}>{item.icon}</span>
-              <span className={isActive ? "" : "text-muted hover:text-foreground"}>
+              <span
+                className="flex-shrink-0"
+                style={isActive ? { color: accentColor } : { color: "var(--muted)" }}
+              >
+                {item.icon}
+              </span>
+              <span
+                className={isActive ? "" : "text-muted"}
+                style={isActive ? { color: accentColor } : undefined}
+              >
                 {item.label}
               </span>
             </Link>
@@ -65,10 +95,11 @@ export function Sidebar({
         })}
       </nav>
 
+      {/* User footer */}
       <div className="px-3 py-4 border-t border-border">
-        <div className="flex items-center gap-3 px-2 mb-3">
+        <div className="flex items-center gap-3 px-2 mb-2">
           <div
-            className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
+            className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
             style={{ background: accentBg, color: accentColor }}
           >
             {userInitials}
@@ -81,7 +112,7 @@ export function Sidebar({
         <form action={logoutAction}>
           <button
             type="submit"
-            className="w-full flex items-center gap-2.5 rounded-[--radius-sm] px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground transition-colors"
+            className="w-full flex items-center gap-2.5 rounded-lg px-3 min-h-[44px] text-sm text-muted hover:bg-surface hover:text-foreground transition-colors cursor-pointer"
           >
             <svg
               className="h-4 w-4 flex-shrink-0"

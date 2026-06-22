@@ -52,6 +52,24 @@ body {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* Prevent accidental pull-to-refresh on scrollable content */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .flashcard-card {
+    transition: none !important;
+  }
 }
 
 /* Flashcard flip animation */
