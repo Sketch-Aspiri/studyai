@@ -1,21 +1,35 @@
-export type CardStatus = 'new' | 'known' | 'review'
+export type UserRole = "STUDENT" | "TEACHER"
+export type SubscriptionStatus = "FREE" | "PRO" | "CANCELED"
+export type FileType = "PDF" | "DOCX" | "PPTX" | "TXT"
+export type ProcessingStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED"
+export type ResourceType = "SUMMARY" | "CONCEPT_MAP" | "EXAM" | "FLASHCARDS"
 
-export interface FlashCard {
+export interface ConceptMapData {
+  nodes: { id: string; label: string; type: "main" | "sub" | "detail" }[]
+  edges: { source: string; target: string; label: string }[]
+}
+
+export interface ExamQuestion {
+  id: string
+  question: string
+  options: string[]
+  correct_index: number
+  explanation: string
+}
+
+export interface ExamData {
+  questions: ExamQuestion[]
+}
+
+export interface Flashcard {
   id: string
   front: string
   back: string
-  status: CardStatus
+  category?: string
 }
 
-export interface Deck {
-  id: string
-  name: string
-  createdAt: string
-  cards: FlashCard[]
-  cardCount: number
+export interface FlashcardsData {
+  flashcards: Flashcard[]
 }
 
-export interface Settings {
-  apiKey: string
-  defaultCardCount: number
-}
+export type ResourceContent = string | ConceptMapData | ExamData | FlashcardsData
