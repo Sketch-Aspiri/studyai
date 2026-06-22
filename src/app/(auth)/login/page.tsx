@@ -25,7 +25,7 @@ function LoginForm() {
 
       {(state?.error || errorParam) && (
         <div className="mb-4 rounded-[--radius-sm] bg-red-50 border border-red-200 px-4 py-3 text-sm text-destructive">
-          {state?.error ?? "Error de autenticación. Intenta de nuevo."}
+          {state?.error ?? errorParam}
         </div>
       )}
 
