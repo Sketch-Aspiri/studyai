@@ -6,6 +6,7 @@ import { ensureUser } from "@/lib/ensure-user"
 import { generateSummary } from "@/lib/ai/generate-summary"
 import { generateConceptMap } from "@/lib/ai/generate-concept-map"
 import { generateExam } from "@/lib/ai/generate-exam"
+import { generateFlashcards } from "@/lib/ai/generate-flashcards"
 import { z } from "zod"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
@@ -53,9 +54,6 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
   const { type, document_ids, title } = parsed.data
 
-  if (type === "FLASHCARDS") {
-    return NextResponse.json({ error: "Este tipo de recurso estará disponible próximamente." }, { status: 501 })
-  }
 
   const documents = await db.document.findMany({
     where: { id: { in: document_ids }, project_id: projectId, user_id: user.id },
@@ -101,7 +99,9 @@ export async function POST(request: Request, { params }: RouteParams) {
             ? generateSummary(documentTexts)
             : type === "CONCEPT_MAP"
             ? generateConceptMap(documentTexts)
-            : generateExam(documentTexts)
+            : type === "EXAM"
+            ? generateExam(documentTexts)
+            : generateFlashcards(documentTexts)
 
         let fullText = ""
         for await (const chunk of generator) {

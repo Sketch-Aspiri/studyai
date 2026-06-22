@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { SummaryViewer } from "./summary-viewer"
 import { ConceptMapViewer, type ConceptMapData } from "./concept-map-viewer"
 import { ExamPlayer, type ExamData } from "./exam-player"
+import { FlashcardDeck, type FlashcardsData } from "./flashcard-deck"
 
 interface Resource {
   id: string
@@ -45,6 +46,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   const examData =
     resource.type === "EXAM"
       ? (resource.content as ExamData)
+      : null
+
+  const flashcardsData =
+    resource.type === "FLASHCARDS"
+      ? (resource.content as FlashcardsData)
       : null
 
   function handleDelete() {
@@ -114,6 +120,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       {expanded && examData && (
         <div className="border-t border-border px-5 py-4 max-h-[700px] overflow-y-auto">
           <ExamPlayer content={examData} />
+        </div>
+      )}
+      {expanded && flashcardsData && (
+        <div className="border-t border-border px-5 py-4 max-h-[700px] overflow-y-auto">
+          <FlashcardDeck content={flashcardsData} />
         </div>
       )}
     </div>
