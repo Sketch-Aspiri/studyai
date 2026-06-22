@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { ResourceType } from "@prisma/client"
 import { generateSummary } from "@/lib/ai/generate-summary"
 import { generateConceptMap } from "@/lib/ai/generate-concept-map"
+import { generateExam } from "@/lib/ai/generate-exam"
 import { z } from "zod"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
@@ -49,7 +50,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
   const { type, document_ids, title } = parsed.data
 
-  if (type === "EXAM" || type === "FLASHCARDS") {
+  if (type === "FLASHCARDS") {
     return NextResponse.json({ error: "Este tipo de recurso estará disponible próximamente." }, { status: 501 })
   }
 
@@ -92,9 +93,12 @@ export async function POST(request: Request, { params }: RouteParams) {
         resourceId = resource.id
         controller.enqueue(encode({ type: "start", resource_id: resource.id }))
 
-        const generator = type === "SUMMARY"
-          ? generateSummary(documentTexts)
-          : generateConceptMap(documentTexts)
+        const generator =
+          type === "SUMMARY"
+            ? generateSummary(documentTexts)
+            : type === "CONCEPT_MAP"
+            ? generateConceptMap(documentTexts)
+            : generateExam(documentTexts)
 
         let fullText = ""
         for await (const chunk of generator) {

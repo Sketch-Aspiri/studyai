@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { SummaryViewer } from "./summary-viewer"
 import { ConceptMapViewer, type ConceptMapData } from "./concept-map-viewer"
+import { ExamPlayer, type ExamData } from "./exam-player"
 
 interface Resource {
   id: string
@@ -39,6 +40,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   const conceptMapData =
     resource.type === "CONCEPT_MAP"
       ? (resource.content as ConceptMapData)
+      : null
+
+  const examData =
+    resource.type === "EXAM"
+      ? (resource.content as ExamData)
       : null
 
   function handleDelete() {
@@ -103,6 +109,11 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       {expanded && conceptMapData && (
         <div className="border-t border-border p-4">
           <ConceptMapViewer content={conceptMapData} />
+        </div>
+      )}
+      {expanded && examData && (
+        <div className="border-t border-border px-5 py-4 max-h-[700px] overflow-y-auto">
+          <ExamPlayer content={examData} />
         </div>
       )}
     </div>
