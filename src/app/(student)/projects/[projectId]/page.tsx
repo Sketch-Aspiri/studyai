@@ -4,6 +4,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { DocumentUploader } from "@/components/student/document-uploader"
 import { DocumentList } from "@/components/student/document-list"
+import { GenerationPanel } from "@/components/student/generation-panel"
+import { ResourceCard } from "@/components/student/resource-card"
 
 type Props = { params: Promise<{ projectId: string }> }
 
@@ -11,9 +13,7 @@ export default async function StudentProjectPage({ params }: Props) {
   const { projectId } = await params
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const project = await db.project.findFirst({
     where: { id: projectId, user_id: user!.id, deleted_at: null },
@@ -51,19 +51,13 @@ export default async function StudentProjectPage({ params }: Props) {
 
       {/* Documents section */}
       <section className="bg-white rounded-[--radius-md] border border-border p-6 mb-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-foreground">
-            Documentos
-            {project.documents.length > 0 && (
-              <span className="ml-2 text-sm font-normal text-muted">
-                ({project.documents.length})
-              </span>
-            )}
-          </h2>
-        </div>
-
+        <h2 className="text-base font-semibold text-foreground mb-5">
+          Documentos
+          {project.documents.length > 0 && (
+            <span className="ml-2 text-sm font-normal text-muted">({project.documents.length})</span>
+          )}
+        </h2>
         <DocumentUploader projectId={project.id} />
-
         {project.documents.length > 0 && (
           <div className="mt-4">
             <DocumentList documents={project.documents} />
@@ -71,19 +65,39 @@ export default async function StudentProjectPage({ params }: Props) {
         )}
       </section>
 
-      {/* Resources placeholder — implemented in Steps 8–11 */}
-      <section className="bg-white rounded-[--radius-md] border border-border p-6">
-        <h2 className="text-base font-semibold text-foreground mb-4">Recursos de estudio</h2>
-        {project.documents.length === 0 ? (
-          <p className="text-sm text-muted">
-            Sube al menos un documento para poder generar recursos con IA.
-          </p>
-        ) : (
-          <p className="text-sm text-muted">
-            La generación de recursos con IA estará disponible próximamente.
-          </p>
-        )}
-      </section>
+      {/* Generation + Resources section */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-6 items-start">
+        {/* Generation panel */}
+        <section className="bg-white rounded-[--radius-md] border border-border p-6">
+          <h2 className="text-base font-semibold text-foreground mb-5">Generar con IA</h2>
+          {project.documents.length === 0 ? (
+            <p className="text-sm text-muted">
+              Sube al menos un documento para poder generar recursos con IA.
+            </p>
+          ) : (
+            <GenerationPanel projectId={project.id} documents={project.documents} />
+          )}
+        </section>
+
+        {/* Resources list */}
+        <section className="bg-white rounded-[--radius-md] border border-border p-6">
+          <h2 className="text-base font-semibold text-foreground mb-5">
+            Recursos generados
+            {project.resources.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-muted">({project.resources.length})</span>
+            )}
+          </h2>
+          {project.resources.length === 0 ? (
+            <p className="text-sm text-muted italic">Aún no hay recursos generados para este proyecto.</p>
+          ) : (
+            <div className="space-y-3">
+              {project.resources.map((resource) => (
+                <ResourceCard key={resource.id} resource={resource} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   )
 }
