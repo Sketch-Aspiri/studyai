@@ -128,7 +128,8 @@ export async function POST(request: Request, { params }: RouteParams) {
           savedContent = { text: fullText }
         } else {
           try {
-            savedContent = JSON.parse(fullText) as object
+            const cleaned = fullText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim()
+            savedContent = JSON.parse(cleaned) as object
           } catch {
             throw new Error("La IA devolvió un formato inválido. Intenta de nuevo.")
           }
