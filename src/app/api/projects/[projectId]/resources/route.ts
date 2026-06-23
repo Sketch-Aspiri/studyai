@@ -7,6 +7,7 @@ import { generateSummary } from "@/lib/ai/generate-summary"
 import { generateConceptMap } from "@/lib/ai/generate-concept-map"
 import { generateExam } from "@/lib/ai/generate-exam"
 import { generateFlashcards } from "@/lib/ai/generate-flashcards"
+import { checkGenerationLimit } from "@/lib/rate-limiter"
 import { z } from "zod"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
@@ -41,6 +42,19 @@ export async function POST(request: Request, { params }: RouteParams) {
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
 
   await ensureUser(user)
+
+  const dbUser = await db.user.findUnique({
+    where: { id: user.id },
+    select: { subscription_status: true },
+  })
+  const isPro = dbUser?.subscription_status === "PRO"
+  const rateLimitResult = await checkGenerationLimit(user.id, isPro)
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: `Límite de generaciones del plan alcanzado (${rateLimitResult.limit}/mes). Mejora tu plan para continuar.` },
+      { status: 429 }
+    )
+  }
 
   const project = await db.project.findFirst({
     where: { id: projectId, user_id: user.id, deleted_at: null },

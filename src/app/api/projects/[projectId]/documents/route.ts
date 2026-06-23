@@ -112,11 +112,13 @@ export async function POST(request: Request, { params }: RouteParams) {
       data: { text_content: textContent, processing_status: "COMPLETED" },
     })
     return NextResponse.json(completed, { status: 201 })
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error("[extractText error]", message)
     const failed = await db.document.update({
       where: { id: document.id },
       data: { processing_status: "FAILED" },
     })
-    return NextResponse.json(failed, { status: 201 })
+    return NextResponse.json({ ...failed, extractionError: message }, { status: 201 })
   }
 }

@@ -138,9 +138,39 @@ export default function LandingPage() {
         </section>
       </main>
 
+      <section className="bg-primary py-16">
+        <div className="mx-auto max-w-5xl px-6 text-center">
+          <h2 className="text-2xl font-semibold text-white mb-3">
+            Listo para estudiar mejor?
+          </h2>
+          <p className="text-primary-foreground/80 text-sm mb-6">
+            Gratis para siempre. Sin tarjeta de crédito.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/signup"
+              className="rounded-[--radius-sm] bg-white px-6 py-3 text-sm font-semibold text-primary hover:bg-gray-50 transition-colors"
+            >
+              Comenzar gratis
+            </Link>
+            <Link
+              href="/pricing"
+              className="rounded-[--radius-sm] border border-white/40 px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+            >
+              Ver precios
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-5xl px-6 text-center text-xs text-muted">
-          © {new Date().getFullYear()} StudyAI. Todos los derechos reservados.
+        <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+          <span>© {new Date().getFullYear()} StudyAI. Todos los derechos reservados.</span>
+          <div className="flex items-center gap-4">
+            <Link href="/pricing" className="hover:text-foreground transition-colors">Precios</Link>
+            <Link href="/signup" className="hover:text-foreground transition-colors">Registrarse</Link>
+            <Link href="/login" className="hover:text-foreground transition-colors">Iniciar sesión</Link>
+          </div>
         </div>
       </footer>
     </div>
