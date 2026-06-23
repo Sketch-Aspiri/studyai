@@ -125,3 +125,10 @@ body {
 .markdown table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9em; }
 .markdown th { background: var(--surface); font-weight: 600; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
 .markdown td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
+
+/* Print: show only the fullscreen resource overlay */
+@media print {
+  body > * { display: none !important; }
+  .resource-print-overlay { display: flex !important; position: static !important; height: auto !important; overflow: visible !important; }
+  .resource-print-overlay .no-print { display: none !important; }
+}

@@ -56,6 +56,7 @@ interface ResourceCardProps {
 
 export function ResourceCard({ resource }: ResourceCardProps) {
   const [expanded, setExpanded] = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -77,6 +78,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   const flashcardsData =
     resource.type === "FLASHCARDS" ? (resource.content as FlashcardsData) : null
 
+  const hasContent = !!(summaryText || conceptMapData || examData || flashcardsData)
+
   function handleDelete() {
     startTransition(async () => {
       await fetch(`/api/resources/${resource.id}`, { method: "DELETE" })
@@ -84,73 +87,153 @@ export function ResourceCard({ resource }: ResourceCardProps) {
     })
   }
 
+  function handlePrint() {
+    window.print()
+  }
+
   return (
-    <div className="bg-white rounded-lg border border-border overflow-hidden">
-      <div className="flex items-center gap-3 p-4">
-        <span className="flex-shrink-0 h-8 w-8 rounded-lg bg-surface flex items-center justify-center text-muted">
-          {meta.icon}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-muted">{meta.label}</p>
-          <p className="text-sm font-semibold text-foreground truncate">{resource.title}</p>
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="min-h-[40px] rounded-lg px-3 text-xs font-medium text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-          >
-            {expanded ? "Cerrar" : "Ver"}
-          </button>
-          {!confirmDelete ? (
+    <>
+      <div className="bg-white rounded-lg border border-border overflow-hidden">
+        <div className="flex items-center gap-3 p-4">
+          <span className="flex-shrink-0 h-8 w-8 rounded-lg bg-surface flex items-center justify-center text-muted">
+            {meta.icon}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-muted">{meta.label}</p>
+            <p className="text-sm font-semibold text-foreground truncate">{resource.title}</p>
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {hasContent && (
+              <button
+                onClick={() => setFullscreen(true)}
+                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                aria-label="Pantalla completa"
+                title="Pantalla completa"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </button>
+            )}
             <button
-              onClick={() => setConfirmDelete(true)}
-              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer"
-              aria-label="Eliminar recurso"
+              onClick={() => setExpanded((v) => !v)}
+              className="min-h-[40px] rounded-lg px-3 text-xs font-medium text-primary hover:bg-primary/5 transition-colors cursor-pointer"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              {expanded ? "Cerrar" : "Ver"}
             </button>
-          ) : (
-            <div className="flex items-center gap-1">
+            {!confirmDelete ? (
               <button
-                onClick={() => setConfirmDelete(false)}
-                className="min-h-[40px] px-2 text-xs text-muted hover:text-foreground cursor-pointer"
+                onClick={() => setConfirmDelete(true)}
+                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer"
+                aria-label="Eliminar recurso"
               >
-                No
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
               </button>
-              <button
-                onClick={handleDelete}
-                disabled={isPending}
-                className="min-h-[40px] px-2 text-xs font-medium text-destructive hover:bg-red-50 rounded transition-colors cursor-pointer"
-              >
-                {isPending ? "..." : "Sí"}
-              </button>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="min-h-[40px] px-2 text-xs text-muted hover:text-foreground cursor-pointer"
+                >
+                  No
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isPending}
+                  className="min-h-[40px] px-2 text-xs font-medium text-destructive hover:bg-red-50 rounded transition-colors cursor-pointer"
+                >
+                  {isPending ? "..." : "Sí"}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {expanded && summaryText && (
+          <div className="border-t border-border px-5 py-4 max-h-[600px] overflow-y-auto overscroll-contain">
+            <SummaryViewer content={summaryText} />
+          </div>
+        )}
+        {expanded && conceptMapData && (
+          <div className="border-t border-border p-4">
+            <ConceptMapViewer content={conceptMapData} />
+          </div>
+        )}
+        {expanded && examData && (
+          <div className="border-t border-border px-5 py-4 max-h-[700px] overflow-y-auto overscroll-contain">
+            <ExamPlayer content={examData} />
+          </div>
+        )}
+        {expanded && flashcardsData && (
+          <div className="border-t border-border px-4 py-4 max-h-[700px] overflow-y-auto overscroll-contain">
+            <FlashcardDeck content={flashcardsData} />
+          </div>
+        )}
       </div>
 
-      {expanded && summaryText && (
-        <div className="border-t border-border px-5 py-4 max-h-[600px] overflow-y-auto overscroll-contain">
-          <SummaryViewer content={summaryText} />
+      {fullscreen && (
+        <div className="resource-print-overlay fixed inset-0 z-50 flex flex-col bg-white">
+          {/* Header */}
+          <div className="no-print flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="h-8 w-8 rounded-lg bg-surface flex items-center justify-center text-muted flex-shrink-0">
+                {meta.icon}
+              </span>
+              <div>
+                <p className="text-xs text-muted">{meta.label}</p>
+                <p className="text-sm font-semibold text-foreground">{resource.title}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 min-h-[36px] px-3 rounded-lg text-sm text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                title="Guardar como PDF usando el diálogo de impresión"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Descargar PDF
+              </button>
+              <button
+                onClick={() => setFullscreen(false)}
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                aria-label="Cerrar pantalla completa"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            {summaryText && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <SummaryViewer content={summaryText} />
+              </div>
+            )}
+            {conceptMapData && (
+              <div className="h-full p-4">
+                <ConceptMapViewer content={conceptMapData} />
+              </div>
+            )}
+            {examData && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <ExamPlayer content={examData} />
+              </div>
+            )}
+            {flashcardsData && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <FlashcardDeck content={flashcardsData} />
+              </div>
+            )}
+          </div>
         </div>
       )}
-      {expanded && conceptMapData && (
-        <div className="border-t border-border p-4">
-          <ConceptMapViewer content={conceptMapData} />
-        </div>
-      )}
-      {expanded && examData && (
-        <div className="border-t border-border px-5 py-4 max-h-[700px] overflow-y-auto overscroll-contain">
-          <ExamPlayer content={examData} />
-        </div>
-      )}
-      {expanded && flashcardsData && (
-        <div className="border-t border-border px-4 py-4 max-h-[700px] overflow-y-auto overscroll-contain">
-          <FlashcardDeck content={flashcardsData} />
-        </div>
-      )}
-    </div>
+    </>
   )
 }

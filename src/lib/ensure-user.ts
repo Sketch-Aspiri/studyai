@@ -7,6 +7,9 @@ import type { User } from "@supabase/supabase-js"
  * auth.users → public.users didn't run (common in dev or after DB resets).
  */
 export async function ensureUser(user: User): Promise<void> {
+  const role =
+    (user.user_metadata?.role as "STUDENT" | "TEACHER" | undefined) ?? "STUDENT"
+
   await db.user.upsert({
     where: { id: user.id },
     create: {
@@ -17,7 +20,10 @@ export async function ensureUser(user: User): Promise<void> {
         (user.user_metadata?.name as string | undefined) ??
         null,
       avatar_url: (user.user_metadata?.avatar_url as string | undefined) ?? null,
+      role,
     },
-    update: {},
+    update: {
+      role,
+    },
   })
 }

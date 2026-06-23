@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@/lib/db"
+import { ensureUser } from "@/lib/ensure-user"
 import { z } from "zod"
 import { customAlphabet } from "nanoid"
 
@@ -17,6 +18,8 @@ export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+
+  await ensureUser(user)
 
   const dbUser = await db.user.findUnique({
     where: { id: user.id },

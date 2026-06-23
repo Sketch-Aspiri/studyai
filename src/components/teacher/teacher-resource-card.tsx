@@ -57,6 +57,7 @@ interface TeacherResourceCardProps {
 
 export function TeacherResourceCard({ resource }: TeacherResourceCardProps) {
   const [expanded, setExpanded] = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [publishOpen, setPublishOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -79,11 +80,17 @@ export function TeacherResourceCard({ resource }: TeacherResourceCardProps) {
   const flashcardsData =
     resource.type === "FLASHCARDS" ? (resource.content as FlashcardsData) : null
 
+  const hasContent = !!(summaryText || conceptMapData || examData || flashcardsData)
+
   function handleDelete() {
     startTransition(async () => {
       await fetch(`/api/resources/${resource.id}`, { method: "DELETE" })
       router.refresh()
     })
+  }
+
+  function handlePrint() {
+    window.print()
   }
 
   return (
@@ -110,6 +117,18 @@ export function TeacherResourceCard({ resource }: TeacherResourceCardProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
                 Publicar
+              </button>
+            )}
+            {hasContent && (
+              <button
+                onClick={() => setFullscreen(true)}
+                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                aria-label="Pantalla completa"
+                title="Pantalla completa"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
               </button>
             )}
             <button
@@ -169,6 +188,68 @@ export function TeacherResourceCard({ resource }: TeacherResourceCardProps) {
           </div>
         )}
       </div>
+
+      {fullscreen && (
+        <div className="resource-print-overlay fixed inset-0 z-50 flex flex-col bg-white">
+          {/* Header */}
+          <div className="no-print flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="h-8 w-8 rounded-lg bg-surface flex items-center justify-center text-muted flex-shrink-0">
+                {meta.icon}
+              </span>
+              <div>
+                <p className="text-xs text-muted">{meta.label}</p>
+                <p className="text-sm font-semibold text-foreground">{resource.title}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 min-h-[36px] px-3 rounded-lg text-sm text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                title="Guardar como PDF usando el diálogo de impresión"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Descargar PDF
+              </button>
+              <button
+                onClick={() => setFullscreen(false)}
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                aria-label="Cerrar pantalla completa"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            {summaryText && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <SummaryViewer content={summaryText} />
+              </div>
+            )}
+            {conceptMapData && (
+              <div className="h-full p-4">
+                <ConceptMapViewer content={conceptMapData} />
+              </div>
+            )}
+            {examData && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <ExamPlayer content={examData} />
+              </div>
+            )}
+            {flashcardsData && (
+              <div className="max-w-3xl mx-auto px-6 py-8">
+                <FlashcardDeck content={flashcardsData} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {publishOpen && (
         <PublishExamDialog
