@@ -69,16 +69,21 @@ export function ResourceCard({ resource }: ResourceCardProps) {
     ),
   }
 
+  const rawContent = resource.content
   const summaryText =
-    resource.type === "SUMMARY" ? (resource.content as { text?: string })?.text ?? "" : ""
+    resource.type === "SUMMARY"
+      ? typeof rawContent === "string"
+        ? rawContent
+        : (rawContent as { text?: string })?.text ?? ""
+      : ""
   const conceptMapData =
-    resource.type === "CONCEPT_MAP" ? (resource.content as ConceptMapData) : null
+    resource.type === "CONCEPT_MAP" ? (rawContent as ConceptMapData) : null
   const examData =
-    resource.type === "EXAM" ? (resource.content as ExamData) : null
+    resource.type === "EXAM" ? (rawContent as ExamData) : null
   const flashcardsData =
-    resource.type === "FLASHCARDS" ? (resource.content as FlashcardsData) : null
+    resource.type === "FLASHCARDS" ? (rawContent as FlashcardsData) : null
 
-  const hasContent = !!(summaryText || conceptMapData || examData || flashcardsData)
+  const canPrint = resource.type !== "CONCEPT_MAP"
 
   function handleDelete() {
     startTransition(async () => {
@@ -88,7 +93,9 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   }
 
   function handlePrint() {
+    document.body.classList.add("printing-resource")
     window.print()
+    document.body.classList.remove("printing-resource")
   }
 
   return (
@@ -103,18 +110,16 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             <p className="text-sm font-semibold text-foreground truncate">{resource.title}</p>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
-            {hasContent && (
-              <button
-                onClick={() => setFullscreen(true)}
-                className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                aria-label="Pantalla completa"
-                title="Pantalla completa"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                </svg>
-              </button>
-            )}
+            <button
+              onClick={() => setFullscreen(true)}
+              className="min-h-[40px] min-w-[40px] flex items-center justify-center rounded-lg text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+              aria-label="Pantalla completa"
+              title="Pantalla completa"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            </button>
             <button
               onClick={() => setExpanded((v) => !v)}
               className="min-h-[40px] rounded-lg px-3 text-xs font-medium text-primary hover:bg-primary/5 transition-colors cursor-pointer"
@@ -187,16 +192,25 @@ export function ResourceCard({ resource }: ResourceCardProps) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-1.5 min-h-[36px] px-3 rounded-lg text-sm text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
-                title="Guardar como PDF usando el diálogo de impresión"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Descargar PDF
-              </button>
+              {canPrint ? (
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-1.5 min-h-[36px] px-3 rounded-lg text-sm text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                  title="Guardar como PDF usando el diálogo de impresión"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Descargar PDF
+                </button>
+              ) : (
+                <span className="flex items-center gap-1.5 min-h-[36px] px-3 text-sm text-muted/50 select-none" title="El mapa conceptual no es compatible con impresión">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  PDF no disponible
+                </span>
+              )}
               <button
                 onClick={() => setFullscreen(false)}
                 className="flex items-center justify-center h-9 w-9 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
@@ -217,7 +231,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
               </div>
             )}
             {conceptMapData && (
-              <div className="h-full p-4">
+              <div className="p-4" style={{ height: "calc(100vh - 73px)" }}>
                 <ConceptMapViewer content={conceptMapData} />
               </div>
             )}

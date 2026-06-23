@@ -128,7 +128,9 @@ body {
 
 /* Print: show only the fullscreen resource overlay */
 @media print {
-  body > * { display: none !important; }
-  .resource-print-overlay { display: flex !important; position: static !important; height: auto !important; overflow: visible !important; }
-  .resource-print-overlay .no-print { display: none !important; }
+  body.printing-resource > * { visibility: hidden; }
+  body.printing-resource .resource-print-overlay,
+  body.printing-resource .resource-print-overlay * { visibility: visible !important; }
+  body.printing-resource .resource-print-overlay { position: fixed !important; inset: 0 !important; background: white !important; }
+  body.printing-resource .resource-print-overlay .no-print { display: none !important; }
 }
