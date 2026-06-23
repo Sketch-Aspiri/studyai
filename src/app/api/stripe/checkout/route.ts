@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { db } from "@/lib/db"
-import { stripe } from "@/lib/stripe"
+import { getStripe } from "@/lib/stripe"
 
 export async function POST() {
   const supabase = await createClient()
@@ -14,6 +14,7 @@ export async function POST() {
   })
   if (!dbUser) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 })
 
+  const stripe = getStripe()
   let customerId = dbUser.stripe_customer_id
 
   if (!customerId) {
