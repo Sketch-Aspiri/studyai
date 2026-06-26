@@ -126,6 +126,29 @@ body {
 .markdown th { background: var(--surface); font-weight: 600; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
 .markdown td { padding: 0.5rem 0.75rem; border: 1px solid var(--border); }
 
+/* Fan carousel layout */
+.fan-layout {
+  height: 22rem;
+}
+@media (min-width: 480px)  { .fan-layout { height: 26rem; } }
+@media (min-width: 640px)  { .fan-layout { height: 28rem; } }
+@media (min-width: 768px)  { .fan-layout { height: 34rem; } }
+@media (min-width: 1024px) { .fan-layout { height: 38rem; } }
+
+.fan-card {
+  position: absolute;
+  width: 9rem;
+  height: 13rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  will-change: transform;
+  cursor: default;
+}
+@media (min-width: 480px)  { .fan-card { width: 10rem;  height: 14.5rem; } }
+@media (min-width: 640px)  { .fan-card { width: 11rem;  height: 16rem;   } }
+@media (min-width: 768px)  { .fan-card { width: 13rem;  height: 19rem;   } }
+@media (min-width: 1024px) { .fan-card { width: 15rem;  height: 22rem;   } }
+
 /* Print: show only the fullscreen resource overlay */
 @media print {
   body.printing-resource > * { visibility: hidden; }

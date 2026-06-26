@@ -1,167 +1,101 @@
 import Link from "next/link"
-
-const features = [
-  {
-    emoji: "📝",
-    title: "Resúmenes",
-    description:
-      "Obtén resúmenes claros y estructurados de tus documentos en segundos.",
-  },
-  {
-    emoji: "🗺️",
-    title: "Mapas conceptuales",
-    description:
-      "Visualiza las relaciones entre ideas con mapas generados automáticamente.",
-  },
-  {
-    emoji: "📋",
-    title: "Exámenes",
-    description:
-      "Genera exámenes de práctica o compártelos con tus alumnos mediante un enlace.",
-  },
-  {
-    emoji: "🃏",
-    title: "Flashcards",
-    description:
-      "Memoriza conceptos clave con tarjetas de estudio interactivas.",
-  },
-]
+import { LandingHero } from "@/components/shared/landing-hero"
+import { GlassBlogCard } from "@/components/ui/glass-blog-card"
+import { BackgroundPathsCta } from "@/components/ui/background-paths"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border bg-white">
-        <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
-          <span className="text-lg font-bold text-primary">StudyAI</span>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-[--radius-sm] bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
-            >
-              Empieza gratis
-            </Link>
-          </div>
-        </div>
-      </header>
+      <LandingHero />
 
       <main className="flex-1">
-        <section className="mx-auto max-w-5xl px-6 py-24 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary mb-6">
-            ✨ Powered by Claude AI
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight mb-5">
-            Transforma tus documentos en{" "}
-            <span className="text-primary">recursos de estudio</span>
-          </h1>
-          <p className="text-lg text-muted max-w-xl mx-auto mb-8">
-            Sube PDFs, presentaciones o textos y genera resúmenes, mapas
-            conceptuales, exámenes y flashcards con inteligencia artificial.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="rounded-[--radius-sm] bg-primary px-6 py-3 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
-            >
-              Empieza gratis — sin tarjeta
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-[--radius-sm] border border-border px-6 py-3 text-sm font-medium text-foreground hover:bg-surface transition-colors"
-            >
-              Ya tengo cuenta
-            </Link>
-          </div>
-        </section>
 
-        <section className="bg-surface py-20">
+        {/* Features section */}
+        <section className="bg-surface py-16">
           <div className="mx-auto max-w-5xl px-6">
-            <h2 className="text-2xl font-semibold text-center text-foreground mb-12">
+            <h2 className="text-2xl font-semibold text-center text-foreground mb-2">
               Todo lo que necesitas para estudiar mejor
             </h2>
+            <p className="text-sm text-muted text-center mb-10">
+              Powered by Claude AI — resultados en segundos
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="bg-white rounded-[--radius-md] border border-border p-6"
-                >
-                  <div className="text-3xl mb-3">{feature.emoji}</div>
-                  <h3 className="font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-muted leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
+              <GlassBlogCard
+                title="Resúmenes"
+                excerpt="Obtén resúmenes claros y estructurados de tus documentos en segundos."
+                image="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80"
+                tags={["IA", "Automático"]}
+                ctaLabel="Ver ejemplo"
+                ctaHref="/signup"
+              />
+              <GlassBlogCard
+                title="Mapas conceptuales"
+                excerpt="Visualiza las relaciones entre ideas con mapas generados automáticamente."
+                image="https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=800&q=80"
+                tags={["Visual", "IA"]}
+                ctaLabel="Ver ejemplo"
+                ctaHref="/signup"
+              />
+              <GlassBlogCard
+                title="Exámenes"
+                excerpt="Genera exámenes de práctica o compártelos con tus alumnos mediante un enlace."
+                image="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&q=80"
+                tags={["Maestros", "Compartir"]}
+                ctaLabel="Ver ejemplo"
+                ctaHref="/signup"
+              />
+              <GlassBlogCard
+                title="Flashcards"
+                excerpt="Memoriza conceptos clave con tarjetas de estudio interactivas."
+                image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"
+                tags={["Interactivo", "IA"]}
+                ctaLabel="Ver ejemplo"
+                ctaHref="/signup"
+              />
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6 py-20">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="rounded-[--radius-lg] border-2 border-primary/20 bg-primary/5 p-8">
-              <div className="text-3xl mb-3">🎓</div>
-              <h3 className="text-xl font-semibold text-primary mb-2">Estudiantes</h3>
-              <p className="text-sm text-muted mb-4">
-                Sube tus apuntes y genera recursos personalizados para estudiar más eficientemente.
-              </p>
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-              >
-                Comenzar como estudiante →
-              </Link>
-            </div>
-            <div className="rounded-[--radius-lg] border-2 border-[--teacher]/20 bg-[--teacher]/5 p-8">
-              <div className="text-3xl mb-3">🏫</div>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--teacher)" }}>
-                Maestros
-              </h3>
-              <p className="text-sm text-muted mb-4">
-                Crea exámenes desde tus materiales y compártelos con tus alumnos con un simple enlace.
-              </p>
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-                style={{ color: "var(--teacher)" }}
-              >
-                Comenzar como maestro →
-              </Link>
+        {/* Student / Teacher section */}
+        <section className="py-16">
+          <div className="mx-auto max-w-5xl px-6">
+            <h2 className="text-2xl font-semibold text-center text-foreground mb-2">
+              Diseñado para cada rol
+            </h2>
+            <p className="text-sm text-muted text-center mb-10">
+              Una plataforma, dos experiencias a medida
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <GlassBlogCard
+                title="Para Estudiantes"
+                excerpt="Sube tus apuntes y genera recursos personalizados para estudiar más eficientemente. Resúmenes, mapas y flashcards en un clic."
+                image="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80"
+                tags={["Gratis", "Personal"]}
+                ctaLabel="Comenzar como estudiante"
+                ctaHref="/signup"
+              />
+              <GlassBlogCard
+                title="Para Maestros"
+                excerpt="Crea exámenes desde tus materiales y compártelos con tus alumnos mediante un enlace. Sin registro requerido para los alumnos."
+                image="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80"
+                tags={["Exámenes", "Compartir"]}
+                ctaLabel="Comenzar como maestro"
+                ctaHref="/signup"
+              />
             </div>
           </div>
         </section>
+
       </main>
 
-      <section className="bg-primary py-16">
-        <div className="mx-auto max-w-5xl px-6 text-center">
-          <h2 className="text-2xl font-semibold text-white mb-3">
-            Listo para estudiar mejor?
-          </h2>
-          <p className="text-primary-foreground/80 text-sm mb-6">
-            Gratis para siempre. Sin tarjeta de crédito.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="rounded-[--radius-sm] bg-white px-6 py-3 text-sm font-semibold text-primary hover:bg-gray-50 transition-colors"
-            >
-              Comenzar gratis
-            </Link>
-            <Link
-              href="/pricing"
-              className="rounded-[--radius-sm] border border-white/40 px-6 py-3 text-sm font-medium text-white hover:bg-white/10 transition-colors"
-            >
-              Ver precios
-            </Link>
-          </div>
-        </div>
-      </section>
+      <BackgroundPathsCta
+        title="¿Listo para estudiar mejor?"
+        subtitle="Gratis para siempre. Sin tarjeta de crédito."
+        primaryLabel="Comenzar gratis"
+        primaryHref="/signup"
+        secondaryLabel="Ver precios"
+        secondaryHref="/pricing"
+      />
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
