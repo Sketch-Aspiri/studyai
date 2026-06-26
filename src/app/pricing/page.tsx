@@ -1,29 +1,91 @@
-import Link from "next/link"
-import type { Metadata } from "next"
+"use client";
 
-export const metadata: Metadata = {
-  title: "Precios — StudyAI",
-  description: "Planes gratuitos y Pro para estudiantes y maestros. Empieza sin tarjeta.",
-}
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { PricingCard } from "@/components/ui/pricing-card-1";
+import { BackgroundPathsCta } from "@/components/ui/background-paths";
 
-const studentFeatures = {
-  free: ["2 proyectos", "3 documentos por proyecto", "15 generaciones al mes", "Todos los tipos de recurso"],
-  pro: ["Proyectos ilimitados", "Documentos ilimitados", "200 generaciones al mes", "Todos los tipos de recurso"],
-}
+const studentPlans = [
+  {
+    title: "Estudiante Gratis",
+    price: "$0",
+    priceDescription: "Para siempre",
+    description: "Ideal para empezar a estudiar con IA sin ningún compromiso.",
+    features: [
+      "2 proyectos",
+      "3 documentos por proyecto",
+      "15 generaciones al mes",
+      "Todos los tipos de recurso",
+    ],
+    buttonText: "Comenzar gratis",
+    isHighlighted: false,
+  },
+  {
+    title: "Estudiante Pro",
+    price: "$9.99",
+    priceDescription: "/mes — cancela cuando quieras",
+    description: "Para estudiantes que necesitan más proyectos y generaciones sin límite.",
+    features: [
+      "Proyectos ilimitados",
+      "Documentos ilimitados",
+      "200 generaciones al mes",
+      "Todos los tipos de recurso",
+    ],
+    buttonText: "Comenzar Pro",
+    isHighlighted: true,
+    highlightLabel: "Popular",
+  },
+];
 
-const teacherFeatures = {
-  free: ["2 proyectos", "3 documentos por proyecto", "15 generaciones al mes", "Publicar hasta 3 exámenes activos"],
-  pro: ["Proyectos ilimitados", "Documentos ilimitados", "200 generaciones al mes", "Exámenes ilimitados", "Analíticas avanzadas"],
-}
+const teacherPlans = [
+  {
+    title: "Maestro Gratis",
+    price: "$0",
+    priceDescription: "Para siempre",
+    description: "Perfecto para empezar a crear y compartir exámenes con tus alumnos.",
+    features: [
+      "2 proyectos",
+      "3 documentos por proyecto",
+      "15 generaciones al mes",
+      "Publicar hasta 3 exámenes activos",
+    ],
+    buttonText: "Comenzar gratis",
+    isHighlighted: false,
+    highlightColor: "#059669",
+  },
+  {
+    title: "Maestro Pro",
+    price: "$12.99",
+    priceDescription: "/mes — cancela cuando quieras",
+    description: "Para maestros que quieren escalar su práctica con herramientas avanzadas.",
+    features: [
+      "Proyectos ilimitados",
+      "Documentos ilimitados",
+      "200 generaciones al mes",
+      "Exámenes ilimitados",
+      "Analíticas avanzadas",
+    ],
+    buttonText: "Comenzar Pro",
+    isHighlighted: true,
+    highlightLabel: "Popular",
+    highlightColor: "#059669",
+  },
+];
 
 export default function PricingPage() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border bg-white">
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-white sticky top-0 z-50">
         <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
           <Link href="/" className="text-lg font-bold text-primary">StudyAI</Link>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-medium text-muted hover:text-foreground transition-colors">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+            >
               Iniciar sesión
             </Link>
             <Link
@@ -36,128 +98,69 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto max-w-5xl px-6 py-16 w-full">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Precios simples y transparentes</h1>
-          <p className="text-lg text-muted">Empieza gratis. Mejora cuando lo necesites.</p>
-        </div>
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="mx-auto max-w-5xl px-6 pt-16 pb-12 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">
+            Planes y precios
+          </p>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-4">
+            Precios simples y transparentes
+          </h1>
+          <p className="text-lg text-muted max-w-xl mx-auto">
+            Empieza gratis. Mejora cuando lo necesites. Sin sorpresas.
+          </p>
+        </section>
 
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-6">
+        {/* Student plans */}
+        <section className="mx-auto max-w-5xl px-6 pb-16">
+          <div className="flex items-center gap-2 mb-6">
             <span className="text-2xl">🎓</span>
             <h2 className="text-xl font-semibold text-foreground">Para Estudiantes</h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="bg-white rounded-[--radius-md] border border-border p-6">
-              <div className="text-sm font-medium text-muted mb-1">Gratuito</div>
-              <div className="text-3xl font-bold text-foreground mb-1">$0</div>
-              <p className="text-sm text-muted mb-6">Para siempre</p>
-              <ul className="space-y-2.5 text-sm text-muted mb-6">
-                {studentFeatures.free.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span className="text-success">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/signup"
-                className="block text-center rounded-[--radius-sm] border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-surface transition-colors"
-              >
-                Comenzar gratis
-              </Link>
-            </div>
-
-            <div className="bg-white rounded-[--radius-md] border-2 border-primary p-6 relative">
-              <div className="absolute -top-3 left-4 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-                Popular
-              </div>
-              <div className="text-sm font-medium text-muted mb-1">Pro</div>
-              <div className="text-3xl font-bold text-foreground mb-1">
-                $9.99<span className="text-base font-normal text-muted">/mes</span>
-              </div>
-              <p className="text-sm text-muted mb-6">Cancela cuando quieras</p>
-              <ul className="space-y-2.5 text-sm text-muted mb-6">
-                {studentFeatures.pro.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span className="text-success">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/signup"
-                className="block text-center rounded-[--radius-sm] bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
-              >
-                Comenzar Pro
-              </Link>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {studentPlans.map((plan) => (
+              <PricingCard
+                key={plan.title}
+                {...plan}
+                highlightColor="var(--primary)"
+                onButtonClick={() => router.push("/signup")}
+              />
+            ))}
           </div>
         </section>
 
-        <section>
-          <div className="flex items-center gap-3 mb-6">
+        {/* Teacher plans */}
+        <section className="mx-auto max-w-5xl px-6 pb-20">
+          <div className="flex items-center gap-2 mb-6">
             <span className="text-2xl">🏫</span>
             <h2 className="text-xl font-semibold text-foreground">Para Maestros</h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="bg-white rounded-[--radius-md] border border-border p-6">
-              <div className="text-sm font-medium text-muted mb-1">Gratuito</div>
-              <div className="text-3xl font-bold text-foreground mb-1">$0</div>
-              <p className="text-sm text-muted mb-6">Para siempre</p>
-              <ul className="space-y-2.5 text-sm text-muted mb-6">
-                {teacherFeatures.free.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span className="text-success">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/signup"
-                className="block text-center rounded-[--radius-sm] border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-surface transition-colors"
-              >
-                Comenzar gratis
-              </Link>
-            </div>
-
-            <div
-              className="bg-white rounded-[--radius-md] border-2 p-6 relative"
-              style={{ borderColor: "var(--teacher)" }}
-            >
-              <div
-                className="absolute -top-3 left-4 text-white text-xs font-semibold px-2 py-0.5 rounded-full"
-                style={{ background: "var(--teacher)" }}
-              >
-                Popular
-              </div>
-              <div className="text-sm font-medium text-muted mb-1">Pro Maestro</div>
-              <div className="text-3xl font-bold text-foreground mb-1">
-                $12.99<span className="text-base font-normal text-muted">/mes</span>
-              </div>
-              <p className="text-sm text-muted mb-6">Cancela cuando quieras</p>
-              <ul className="space-y-2.5 text-sm text-muted mb-6">
-                {teacherFeatures.pro.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span style={{ color: "var(--teacher)" }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/signup"
-                className="block text-center rounded-[--radius-sm] px-4 py-2.5 text-sm font-medium text-white transition-colors"
-                style={{ background: "var(--teacher)" }}
-              >
-                Comenzar Pro
-              </Link>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {teacherPlans.map((plan) => (
+              <PricingCard
+                key={plan.title}
+                {...plan}
+                onButtonClick={() => router.push("/signup")}
+              />
+            ))}
           </div>
         </section>
       </main>
 
+      {/* CTA */}
+
+      {/* Footer */}
       <footer className="border-t border-border py-8">
-        <div className="mx-auto max-w-5xl px-6 text-center text-xs text-muted">
-          © {new Date().getFullYear()} StudyAI. Todos los derechos reservados.{" "}
-          <Link href="/" className="hover:underline">Volver al inicio</Link>
+        <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+          <span>© {new Date().getFullYear()} StudyAI. Todos los derechos reservados.</span>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="hover:text-foreground transition-colors">Inicio</Link>
+            <Link href="/signup" className="hover:text-foreground transition-colors">Registrarse</Link>
+            <Link href="/login" className="hover:text-foreground transition-colors">Iniciar sesión</Link>
+          </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

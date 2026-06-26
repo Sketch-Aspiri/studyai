@@ -47,7 +47,7 @@ export default function LandingPage() {
               <GlassBlogCard
                 title="Flashcards"
                 excerpt="Memoriza conceptos clave con tarjetas de estudio interactivas."
-                image="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"
+                image="https://anurseinthemaking.com/cdn/shop/files/Thumbnails_FlashcardcardPack_4_7463b5de-2be4-43fd-809c-89d75b489052_1080x.png?v=1720029995"
                 tags={["Interactivo", "IA"]}
                 ctaLabel="Ver ejemplo"
                 ctaHref="/signup"
@@ -90,7 +90,7 @@ export default function LandingPage() {
 
       <BackgroundPathsCta
         title="¿Listo para estudiar mejor?"
-        subtitle="Gratis para siempre. Sin tarjeta de crédito."
+        subtitle="Comienza gratis ahora"
         primaryLabel="Comenzar gratis"
         primaryHref="/signup"
         secondaryLabel="Ver precios"

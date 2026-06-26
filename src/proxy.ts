@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
 
-const PUBLIC_PATHS = new Set(["/", "/login", "/signup"])
+const PUBLIC_PATHS = new Set(["/", "/login", "/signup", "/pricing"])
 const STUDENT_PREFIXES = ["/dashboard", "/projects"]
 const TEACHER_PREFIXES = ["/teacher"]
 

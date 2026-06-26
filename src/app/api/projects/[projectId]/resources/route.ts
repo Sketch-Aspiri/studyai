@@ -7,7 +7,7 @@ import { generateSummary } from "@/lib/ai/generate-summary"
 import { generateConceptMap } from "@/lib/ai/generate-concept-map"
 import { generateExam } from "@/lib/ai/generate-exam"
 import { generateFlashcards } from "@/lib/ai/generate-flashcards"
-import { checkGenerationLimit } from "@/lib/rate-limiter"
+import { checkGenerationLimit, incrementGenerationCount } from "@/lib/rate-limiter"
 import { z } from "zod"
 
 type RouteParams = { params: Promise<{ projectId: string }> }
@@ -140,6 +140,7 @@ export async function POST(request: Request, { params }: RouteParams) {
           data: { content: savedContent },
         })
 
+        await incrementGenerationCount(user.id)
         controller.enqueue(encode({ type: "done", resource_id: resource.id }))
       } catch (err) {
         const message = err instanceof Error ? err.message : "Error al generar el recurso."

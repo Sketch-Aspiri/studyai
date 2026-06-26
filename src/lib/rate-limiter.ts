@@ -10,7 +10,11 @@ function getRedis(): Redis | null {
     return null
   }
   if (!redis) {
-    redis = Redis.fromEnv()
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      cache: "no-store",
+    })
   }
   return redis
 }
@@ -34,22 +38,32 @@ export async function checkGenerationLimit(
 
   try {
     const key = monthKey(userId)
-    const count = (await client.incr(key)) as number
+    const count = ((await client.get(key)) as number | null) ?? 0
+    return {
+      allowed: count < limit,
+      remaining: Math.max(0, limit - count),
+      limit,
+    }
+  } catch {
+    return { allowed: true, remaining: limit, limit }
+  }
+}
 
+export async function incrementGenerationCount(userId: string): Promise<void> {
+  const client = getRedis()
+  if (!client) return
+
+  try {
+    const key = monthKey(userId)
+    const count = (await client.incr(key)) as number
     if (count === 1) {
       const now = new Date()
       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
       const ttl = Math.ceil((nextMonth.getTime() - now.getTime()) / 1000) + 86400
       await client.expire(key, ttl)
     }
-
-    return {
-      allowed: count <= limit,
-      remaining: Math.max(0, limit - count),
-      limit,
-    }
   } catch {
-    return { allowed: true, remaining: limit, limit }
+    // fail silently — generation already happened
   }
 }
 
