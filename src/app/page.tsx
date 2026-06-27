@@ -1,5 +1,26 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { LandingHero } from "@/components/shared/landing-hero"
+
+export const metadata: Metadata = {
+  title: "StudyAI — Transforma tus documentos en recursos de estudio con IA",
+  description:
+    "Sube PDFs, presentaciones y documentos. Genera resúmenes, mapas conceptuales, exámenes y flashcards con IA en segundos. Gratis para siempre.",
+  openGraph: {
+    title: "StudyAI — Estudia más inteligente con IA",
+    description:
+      "Transforma tus documentos en resúmenes, mapas conceptuales, exámenes y flashcards con Claude AI.",
+    type: "website",
+    url: process.env.NEXT_PUBLIC_APP_URL,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "StudyAI" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StudyAI — Estudia más inteligente con IA",
+    description: "Transforma tus documentos en recursos de estudio con IA en segundos.",
+    images: ["/og-image.png"],
+  },
+}
 import { GlassBlogCard } from "@/components/ui/glass-blog-card"
 import { BackgroundPathsCta } from "@/components/ui/background-paths"
 

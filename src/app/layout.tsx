@@ -13,13 +13,29 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "StudyAI — Transforma tus documentos en recursos de estudio",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  title: {
+    default: "StudyAI — Transforma tus documentos en recursos de estudio con IA",
+    template: "%s — StudyAI",
+  },
   description:
-    "Sube tus PDFs, presentaciones y documentos. Genera resúmenes, mapas conceptuales, exámenes y flashcards con IA.",
+    "Sube tus PDFs, presentaciones y documentos. Genera resúmenes, mapas conceptuales, exámenes y flashcards con IA. Gratis para siempre.",
   openGraph: {
-    title: "StudyAI",
-    description: "Transforma tus documentos en recursos de estudio con IA",
+    title: "StudyAI — Estudia más inteligente con IA",
+    description: "Transforma tus documentos en recursos de estudio con IA en segundos.",
     type: "website",
+    siteName: "StudyAI",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "StudyAI" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StudyAI — Estudia más inteligente con IA",
+    description: "Transforma tus documentos en recursos de estudio con IA en segundos.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 

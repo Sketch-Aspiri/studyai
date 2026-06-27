@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db"
 import Link from "next/link"
+import { ProfileEditForm } from "@/components/shared/profile-edit-form"
 
 export default async function StudentSettingsPage() {
   const supabase = await createClient()
@@ -7,7 +9,12 @@ export default async function StudentSettingsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const dbUser = user
+    ? await db.user.findUnique({ where: { id: user.id }, select: { name: true } })
+    : null
+
   const name =
+    dbUser?.name ??
     user?.user_metadata?.name ??
     user?.user_metadata?.full_name ??
     ""
@@ -25,7 +32,7 @@ export default async function StudentSettingsPage() {
           <div className="space-y-3">
             <div>
               <p className="text-xs text-muted uppercase tracking-wide mb-1">Nombre</p>
-              <p className="text-sm text-foreground">{name || "—"}</p>
+              <ProfileEditForm initialName={name} />
             </div>
             <div>
               <p className="text-xs text-muted uppercase tracking-wide mb-1">Email</p>
